@@ -1,0 +1,23 @@
+<launch>
+  <arg name="id" default=""/>
+
+  <arg name="robot_name" default="tb3_$(arg id)"/>
+
+  <group ns="$(arg robot_name)">
+    <param name="agent_id" value="$(arg id)"/>
+
+    <node name="agent_manager" pkg="tb3_coverage_control" type="agent_manager.py"/>
+    <node name="controller" pkg="tb3_coverage_control" type="controller.py"/>
+
+    <param name="robot_description" command="$(find xacro)/xacro
+                  '$(find tb3_coverage_control)/urdf/turtlebot3_burger.urdf.xacro' frame_prefix:=$(arg robot_name)"/>
+
+    <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
+      <param name="publish_frequency" type="double" value="50.0"/>
+      <param name="tf_prefix" value="$(arg robot_name)"/>
+    </node>
+
+    <node name="tf_to_pose" pkg="tb3_coverage_control" type="tf_to_pose.py"/>
+
+  </group>
+</launch>

@@ -1,0 +1,6 @@
+world_frame: "world"
+agent_frame: "base_link"
+
+kp: 1.0
+timer_period: 0.1
+sampling_time: 0.1

@@ -1,0 +1,5 @@
+agent_num: 3
+
+field:
+  grid_accuracy: [100, 100]
+  limit: [[-1.5, 1.5], [-1.5, 1.5]]

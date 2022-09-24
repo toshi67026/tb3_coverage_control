@@ -1,0 +1,37 @@
+<launch>
+  <arg name="id" default=""/>
+
+  <arg name="robot_name" default="tb3_$(arg id)"/>
+
+  <arg name="laser_resolution" default="0.1"/>
+  <arg name="use_laser_noise" default="true"/>
+  <arg name="laser_range_max" default="0.5"/>
+
+  <!--初期姿勢-->
+  <arg name="x_init" default="0"/>
+  <arg name="y_init" default="0"/>
+  <arg name="yaw_init" default="0"/>
+
+  <group ns="$(arg robot_name)">
+    <param name="agent_id" value="$(arg id)"/>
+
+    <node name="agent_manager" pkg="tb3_coverage_control" type="agent_manager.py"/>
+    <node name="controller" pkg="tb3_coverage_control" type="controller.py"/>
+
+    <param name="robot_description" command="$(find xacro)/xacro
+                  '$(find tb3_coverage_control)/urdf/turtlebot3_burger.urdf.xacro' frame_prefix:=$(arg robot_name) laser_resolution:=$(arg laser_resolution) use_laser_noise:=$(arg use_laser_noise) laser_range_max:=$(arg laser_range_max)"/>
+
+    <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
+      <param name="publish_frequency" type="double" value="50.0"/>
+      <param name="tf_prefix" value="$(arg robot_name)"/>
+    </node>
+
+    <node name="odom_to_pose" pkg="tb3_coverage_control" type="odom_to_pose.py"/>
+
+    <node pkg="gazebo_ros" type="spawn_model" name="spawn_urdf" output="screen" args="-unpause -urdf -model $(arg robot_name)
+                -param robot_description -x $(arg x_init) -y $(arg y_init) -Y $(arg yaw_init)"/>
+
+    <node pkg="tf2_ros" type="static_transform_publisher" name="static_transform_publisher" args="0 0 0 0 0 0 world $(arg robot_name)/odom"/>
+
+  </group>
+</launch>

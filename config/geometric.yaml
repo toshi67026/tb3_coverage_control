@@ -1,0 +1,60 @@
+agent_num: 11
+
+field:
+  grid_accuracy: [50, 50]
+  limit: [[-1, 1], [-1, 1]]
+
+agent_0:
+  x_init: 0.5
+  y_init: 0
+  z_init: 0
+
+agent_1:
+  x_init: 0
+  y_init: 0.5
+  z_init: 0
+
+agent_2:
+  x_init: -0.5
+  y_init: 0
+  z_init: 0
+
+agent_3:
+  x_init: 0
+  y_init: -0.5
+  z_init: 0
+
+agent_4:
+  x_init: 0.5
+  y_init: 0.5
+  z_init: 0
+
+agent_5:
+  x_init: -0.5
+  y_init: 0.5
+  z_init: 0
+
+agent_6:
+  x_init: 0.5
+  y_init: -0.5
+  z_init: 0
+
+agent_7:
+  x_init: -0.5
+  y_init: -0.5
+  z_init: 0
+
+agent_8:
+  x_init: 0.3
+  y_init: 0
+  z_init: 0
+
+agent_9:
+  x_init: 0
+  y_init: 0.3
+  z_init: 0
+
+agent_10:
+  x_init: -0.3
+  y_init: 0
+  z_init: 0
