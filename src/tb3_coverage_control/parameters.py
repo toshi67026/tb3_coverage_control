@@ -11,5 +11,5 @@ class GeometricPattern(Enum):
 
     NONE = "none"
     LINE = "line"
+    GAUSS = "gauss"
     CIRCLE = "circle"
-    DISK = "disk"

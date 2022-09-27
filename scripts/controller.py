@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
+import numpy as np
 import rospy
 from geometry_msgs.msg import Pose, Twist
-import numpy as np
 from tf.transformations import euler_from_quaternion
 
 

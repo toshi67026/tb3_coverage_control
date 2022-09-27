@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
-from std_msgs.msg import ColorRGBA
 import numpy as np
+from std_msgs.msg import ColorRGBA
 
 
 def get_color_rgba(color_initial: str, alpha: float = 1.0) -> ColorRGBA:

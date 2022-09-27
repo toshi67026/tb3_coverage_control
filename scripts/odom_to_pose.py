@@ -4,7 +4,7 @@ import rospy
 from geometry_msgs.msg import Pose, PoseStamped
 from nav_msgs.msg import Odometry
 from tf2_geometry_msgs import do_transform_pose
-from tf2_ros import TransformListener, TransformStamped, Buffer
+from tf2_ros import Buffer, TransformListener, TransformStamped
 
 
 class OdomToPose:

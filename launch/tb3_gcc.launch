@@ -4,8 +4,12 @@
 
   <arg name="real" default="false"/>
 
+  <!--geometric patternを選択-->
+  <arg name="gp" default="line" doc="line | gauss | circle"/>
+
   <rosparam command="load" file="$(find tb3_coverage_control)/config/base.yaml"/>
   <rosparam command="load" file="$(find tb3_coverage_control)/config/tb3.yaml"/>
+  <param name="geometric_pattern" value="$(arg gp)"/>
 
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find tb3_coverage_control)/rviz/tb3.rviz"/>
 
@@ -51,4 +55,7 @@
       <arg name="yaw_init" value="0.5"/>
     </include>
   </group>
+
+  <!--joyは最後に起動-->
+  <node name="joy" pkg="joy" type="joy_node"/>
 </launch>

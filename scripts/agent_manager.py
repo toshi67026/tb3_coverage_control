@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 
-from typing import Any, List, Tuple, Union
+from typing import List, Tuple, Union
 
 import numpy as np
 import rospy
-from coverage_control.parameters import GeometricPattern, color_list
-from coverage_control.utils import get_color_rgba, get_random_color_rgba
 from geometry_msgs.msg import Point, Pose, PoseArray, Quaternion, Vector3
 from numpy.typing import NDArray
 from sensor_msgs.msg import Joy
-from std_msgs.msg import Header
+from std_msgs.msg import ColorRGBA, Header
+from tb3_coverage_control.parameters import GeometricPattern, color_list
+from tb3_coverage_control.utils import get_color_rgba, get_random_color_rgba
 from visualization_msgs.msg import Marker
 from voronoi_tessellation.field import Field
 from voronoi_tessellation.voronoi import Voronoi
@@ -61,12 +61,42 @@ class AgentManager:
             scale=Vector3(*self.padding(original_array=self.voronoi.field_.grid_span, padding_value=0.05)),
             color=color_rgba,
         )
-        self.geometric_radius = 0.5
+        # 標準偏差，半径
+        if self.geometric_pattern in [GeometricPattern.GAUSS, GeometricPattern.CIRCLE]:
+            self.geometric_radius = 0.5
         self.phi_cent_position = np.zeros(self.dim)
+
+        # 重要度分布
+        self.phi_marker = Marker(
+            header=Header(stamp=rospy.Time.now(), frame_id=self.world_frame),
+            ns="phi_marker",
+            id=self.agent_id,
+            action=Marker.ADD,
+            type=Marker.CUBE_LIST,
+            pose=Pose(orientation=Quaternion(x=0.0, y=0.0, z=0.0, w=1.0)),
+            scale=Vector3(
+                *self.padding(
+                    original_array=self.voronoi.field_.grid_span,
+                    padding_value=0.05,
+                )
+            ),
+        )
+        grid_accuracy = self.voronoi.field_.grid_accuracy
+        for j in range(grid_accuracy[0]):
+            for k in range(grid_accuracy[1]):
+                self.phi_marker.points.append(
+                    Point(
+                        *self.padding(
+                            original_array=[self.voronoi.field_.grid_map[i][j][k] for i in range(self.dim)],
+                            padding_value=-0.05,
+                        )
+                    )
+                )
 
         # pub
         self.ref_pose_pub = rospy.Publisher("ref_pose", Pose, queue_size=1)
         self.voronoi_region_marker_pub = rospy.Publisher("voronoi_region_marker", Marker, queue_size=1)
+        self.phi_marker_pub = rospy.Publisher("phi_marker", Marker, queue_size=1)
 
         # sub
         rospy.Subscriber("/curr_pose_array", PoseArray, self.curr_pose_array_callback)
@@ -79,19 +109,21 @@ class AgentManager:
             self.voronoi.field_.phi = np.exp(
                 -100 * (sum([grid_map[i] - self.phi_cent_position[i] for i in range(self.dim)])) ** 2
             )
+        elif self.geometric_pattern == GeometricPattern.GAUSS:
+            self.voronoi.field_.phi = np.exp(
+                -100
+                * sum(
+                    [
+                        ((grid_map[i] - self.phi_cent_position[i]) / (2 * self.geometric_radius)) ** 2
+                        for i in range(self.dim)
+                    ]
+                )
+                ** 2
+            )
         elif self.geometric_pattern == GeometricPattern.CIRCLE:
             self.voronoi.field_.phi = np.exp(
                 -100
                 * (
-                    sum([(grid_map[i] - self.phi_cent_position[i]) ** 2 for i in range(self.dim)])
-                    - self.geometric_radius**2
-                )
-                ** 2
-            )
-        elif self.geometric_pattern == GeometricPattern.DISK:
-            self.voronoi.field_.phi = np.exp(
-                -100
-                * self.smooth_ramp(
                     sum([(grid_map[i] - self.phi_cent_position[i]) ** 2 for i in range(self.dim)])
                     - self.geometric_radius**2
                 )
@@ -110,6 +142,15 @@ class AgentManager:
         for voronoi_region_point in zip(*voronoi_region_grid_map):
             self.voronoi_region_marker.points.append(Point(*self.padding(voronoi_region_point)))
         self.voronoi_region_marker_pub.publish(self.voronoi_region_marker)
+
+        phi = self.voronoi.field_.phi
+        self.phi_marker.header.stamp = rospy.Time.now()
+        self.phi_marker.colors.clear()
+        grid_accuracy = self.voronoi.field_.grid_accuracy
+        for j in range(grid_accuracy[0]):
+            for k in range(grid_accuracy[1]):
+                self.phi_marker.colors.append(ColorRGBA(*[*[(phi[j][k] * 3 + 1) / 4] * 3, 1]))
+        self.phi_marker_pub.publish(self.phi_marker)
 
     def calc_voronoi_tesselation(self, pose_list: List[Pose]) -> Tuple[NDArray, List[NDArray]]:
         all_agent_position_list: List[NDArray] = []
@@ -155,17 +196,12 @@ class AgentManager:
         original_array_length = len(original_array)
         return [original_array[i] if i < original_array_length else padding_value for i in range(return_list_length)]
 
-    @staticmethod
-    def smooth_ramp(x: Any) -> NDArray:
-        ret: NDArray = x * (np.arctan(x) / np.pi + 1 / 2)
-        return ret
-
     def joy_callback(self, msg: Joy) -> None:
         # 重要度分布の中心を操作
         self.phi_cent_position = np.array([-msg.axes[0], msg.axes[1]])
-        # [0.25, 0.75]の範囲でgeometric_radiusを操作
-        if self.geometric_pattern == GeometricPattern.CIRCLE or self.geometric_pattern == GeometricPattern.DISK:
-            self.geometric_radius = (msg.axes[4] + 2) / 4
+        # gauss, circleの場合は[0.25, 1.0]の範囲でgeometric_radiusを操作
+        if self.geometric_pattern in [GeometricPattern.GAUSS, GeometricPattern.CIRCLE]:
+            self.geometric_radius = (msg.axes[4] + 3) / 4
 
 
 def main() -> None:
