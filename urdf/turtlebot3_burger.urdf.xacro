@@ -5,13 +5,14 @@
   <xacro:arg name="use_laser_noise" default="true"/>
   <xacro:arg name="laser_range_max" default="3.5"/>
 
-  <xacro:include filename="$(find coverage_control)/urdf/common_properties.xacro"/>
-  <xacro:include filename="$(find coverage_control)/urdf/turtlebot3_burger.gazebo.xacro"/>
+  <xacro:include filename="$(find tb3_coverage_control)/urdf/common_properties.xacro"/>
+  <xacro:include filename="$(find tb3_coverage_control)/urdf/turtlebot3_burger.gazebo.xacro"/>
 
-  <link name="base_footprint"/>
+  <!--実機モードでmotive由来のframeとopencr由来のframe（base_footprint）の干渉を防ぐためframe名を変更する-->
+  <link name="base"/>
 
   <joint name="base_joint" type="fixed">
-    <parent link="base_footprint"/>
+    <parent link="base"/>
     <child link="base_link"/>
     <origin xyz="0.0 0.0 0.010" rpy="0 0 0"/>
   </joint>

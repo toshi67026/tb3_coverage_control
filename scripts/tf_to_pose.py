@@ -26,7 +26,7 @@ class TFToPose:
     def timer_callback(self, tiemr: rospy.Timer) -> None:
         trans: TransformStamped = self.tf_buffer.lookup_transform(
             self.world_frame,
-            "tb3_" + str(self.agent_id),
+            "tb3_" + str(self.agent_id) + "/base",
             rospy.Time(0),
         )
 

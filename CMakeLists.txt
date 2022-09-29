@@ -9,8 +9,6 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   tf2
   tf2_ros
-  turtlebot3
-  turtlebot3_simulations
   visualization_msgs
   vrpn_client_ros
   gazebo_ros

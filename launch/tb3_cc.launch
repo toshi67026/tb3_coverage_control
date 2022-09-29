@@ -9,12 +9,12 @@
 
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find tb3_coverage_control)/rviz/tb3.rviz"/>
 
-  <node name="pose_collector" pkg="tb3_coverage_control" type="pose_collector.py"/>
+  <node name="pose_collector" pkg="tb3_coverage_control" type="pose_collector.py" output="screen"/>
 
   <!--Real mode-->
   <group if="$(arg real)">
     <include file="$(find tb3_coverage_control)/launch/vrpn_client.launch">
-      <arg name="server" default="192.168.0.10"/>
+      <arg name="server" default="192.168.208.10" doc="w8 gauss"/>
     </include>
 
     <include file="$(find tb3_coverage_control)/launch/tb3_real.launch">

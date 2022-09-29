@@ -16,12 +16,12 @@ rosdep install -i -y --from-paths .
 ### Real mode
 #### tb3 coverage control
 ```sh
-roslaunch coverage_control tb3_cc.launch real:=true
+roslaunch tb3_coverage_control tb3_cc.launch real:=true
 ```
 
 ### Sim mode
 ```sh
-roslaunch coverage_control tb3_cc.launch real:=false
+roslaunch tb3_coverage_control tb3_cc.launch real:=false
 ```
 
 ### TODO list

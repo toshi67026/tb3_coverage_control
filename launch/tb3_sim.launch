@@ -19,7 +19,7 @@
     <node name="controller" pkg="tb3_coverage_control" type="controller.py"/>
 
     <param name="robot_description" command="$(find xacro)/xacro
-                  '$(find tb3_coverage_control)/urdf/turtlebot3_burger.urdf.xacro' frame_prefix:=$(arg robot_name) laser_resolution:=$(arg laser_resolution) use_laser_noise:=$(arg use_laser_noise) laser_range_max:=$(arg laser_range_max)"/>
+                  '$(find tb3_coverage_control)/urdf/turtlebot3_burger.urdf.xacro' frame_prefix:=$(arg robot_name)/ laser_resolution:=$(arg laser_resolution) use_laser_noise:=$(arg use_laser_noise) laser_range_max:=$(arg laser_range_max)"/>
 
     <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
       <param name="publish_frequency" type="double" value="50.0"/>
