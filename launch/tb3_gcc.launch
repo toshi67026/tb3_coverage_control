@@ -5,7 +5,7 @@
   <arg name="real" default="false"/>
 
   <!--geometric patternを選択-->
-  <arg name="gp" default="line" doc="line | gauss | circle"/>
+  <arg name="gp" default="line" doc="{line, gauss, circle}"/>
 
   <rosparam command="load" file="$(find tb3_coverage_control)/config/base.yaml"/>
   <rosparam command="load" file="$(find tb3_coverage_control)/config/tb3.yaml"/>
