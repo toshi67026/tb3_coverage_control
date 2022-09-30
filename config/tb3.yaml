@@ -3,3 +3,7 @@ agent_num: 3
 field:
   grid_accuracy: [100, 100]
   limit: [[-1.5, 1.5], [-1.5, 1.5]]
+
+# pcc
+delta_decrease: 0.5
+delta_increase: 0.05

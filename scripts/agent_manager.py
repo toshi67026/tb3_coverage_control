@@ -12,7 +12,7 @@ from tb3_coverage_control.parameters import GeometricPattern, color_list
 from tb3_coverage_control.utils import get_color_rgba, get_random_color_rgba
 from visualization_msgs.msg import Marker
 from voronoi_tessellation.field import Field
-from voronoi_tessellation.voronoi import Voronoi
+from voronoi_tessellation.voronoi import Voronoi, VoronoiWithReliability
 
 
 class AgentManager:
@@ -36,7 +36,22 @@ class AgentManager:
         rospy.loginfo(f"limit: {limit}")
 
         field = Field(grid_accuracy=grid_accuracy, limit=limit)
-        self.voronoi = Voronoi(field)
+
+        voronoi_radius = float(rospy.get_param("/voronoi_radius", default=0.0))
+        delta_decrease = float(rospy.get_param("/delta_decrease", default=0.3))
+        delta_increase = float(rospy.get_param("/delta_increase", default=0.1))
+        rospy.loginfo(f"voronoi_radius: {voronoi_radius}")
+        rospy.loginfo(f"delta_decrease: {delta_decrease}")
+        rospy.loginfo(f"delta_increase: {delta_increase}")
+
+        # voronoi_radiusの値を用いてpccとそれ以外を場合分け
+        if voronoi_radius > 0:
+            self.voronoi = VoronoiWithReliability(
+                field, radius=voronoi_radius, delta_decrease=delta_decrease, delta_increase=delta_increase
+            )
+        else:
+            self.voronoi = Voronoi(field)
+
         rospy.loginfo(f"grid_span: {field.grid_span}")
 
         self.geometric_pattern = GeometricPattern(str(rospy.get_param("/geometric_pattern", default="none")))
