@@ -17,7 +17,7 @@
       <param name="tf_prefix" value="$(arg robot_name)"/>
     </node>
 
-    <node name="tf_to_pose" pkg="tb3_coverage_control" type="tf_to_pose.py"/>
+    <node name="pose_stamped_to_pose" pkg="tb3_coverage_control" type="pose_stamped_to_pose.py"/>
 
   </group>
 </launch>
